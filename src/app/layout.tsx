@@ -4,7 +4,7 @@ import { MonitorProvider } from "@/components/monitor-context";
 import { AppShell } from "@/components/app-shell";
 
 export const metadata: Metadata = {
-  title: "CRM Monitor",
+  title: "Abbey Blue Monitoring",
   description: "Standalone status dashboard for the Abbey Blue CRM.",
 };
 

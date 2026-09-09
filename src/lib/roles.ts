@@ -3,6 +3,8 @@
 // model; wiring real per-user login (mapping a CRM login/SSO identity to one of
 // these roles) is the remaining piece — until then MONITOR_ROLE sets the single
 // operator's role (default super-admin). Roles mirror the CRM's own roles.
+import { HIDDEN_NAV } from "./nav";
+
 export type KpiGroup = "executive" | "financial" | "support" | "security" | "sales" | "team";
 
 export type MonitorRole = "super-admin" | "finance" | "sales" | "marketing" | "hr" | "support";
@@ -18,15 +20,6 @@ const KPI_GROUPS: Record<MonitorRole, KpiGroup[] | "all"> = {
   support: ["executive", "support"],
 };
 
-// Nav hrefs hidden per role (sensitive areas). super-admin sees everything.
-const HIDDEN_NAV: Record<MonitorRole, string[]> = {
-  "super-admin": [],
-  finance: ["/security-events", "/audit-logs"],
-  sales: ["/cost", "/security-events", "/audit-logs", "/monitoring-health"],
-  marketing: ["/cost", "/security-events", "/audit-logs", "/monitoring-health"],
-  hr: ["/cost", "/security-events", "/audit-logs", "/monitoring-health"],
-  support: ["/cost", "/security-events", "/audit-logs", "/monitoring-health"],
-};
 
 export function getRole(): MonitorRole {
   const r = (process.env.MONITOR_ROLE ?? "super-admin") as MonitorRole;
