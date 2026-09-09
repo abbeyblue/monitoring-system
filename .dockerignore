@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.data
+npm-debug.log*
+.env
+.env.local
+*.md
+Dockerfile
+.dockerignore
+ecs-task-def.json
+iam-policy.json

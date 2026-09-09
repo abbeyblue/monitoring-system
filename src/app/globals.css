@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light theme (default, bare :root) — RGB triplets for rgb(var / alpha) */
+:root {
+  --bg: 244 246 249;
+  --panel: 255 255 255;
+  --panel2: 240 243 246;
+  --line: 224 228 234;
+  --ink: 15 23 42;
+  --muted: 91 102 117;
+  --ok: 22 163 74;
+  --warn: 217 119 6;
+  --down: 220 38 38;
+  --idle: 148 163 184;
+  --accent: 37 99 235;
+}
+
+/* Dark — system default (no explicit choice) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: 9 13 20;
+    --panel: 16 21 30;
+    --panel2: 22 28 39;
+    --line: 35 44 58;
+    --ink: 232 237 244;
+    --muted: 138 151 168;
+    --ok: 34 197 94;
+    --warn: 245 158 11;
+    --down: 239 68 68;
+    --idle: 100 116 139;
+    --accent: 59 130 246;
+  }
+}
+
+/* Dark — explicit toggle wins in both directions */
+:root[data-theme="dark"] {
+  --bg: 9 13 20;
+  --panel: 16 21 30;
+  --panel2: 22 28 39;
+  --line: 35 44 58;
+  --ink: 232 237 244;
+  --muted: 138 151 168;
+  --ok: 34 197 94;
+  --warn: 245 158 11;
+  --down: 239 68 68;
+  --idle: 100 116 139;
+  --accent: 59 130 246;
+}
+
+html, body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--line)) transparent;
+}
+*::-webkit-scrollbar { height: 8px; width: 8px; }
+*::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 999px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
