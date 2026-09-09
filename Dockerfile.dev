@@ -1,0 +1,15 @@
+# syntax=docker/dockerfile:1
+
+FROM node:20-alpine
+WORKDIR /app
+
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    HOSTNAME=0.0.0.0 \
+    PORT=4000
+
+COPY package.json package-lock.json ./
+RUN npm ci --include=optional
+
+EXPOSE 4000
+
+CMD ["npm", "run", "dev"]
