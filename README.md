@@ -29,6 +29,16 @@ npm run dev                         # http://localhost:4000
 
 Production: `npm run build && npm start`. Deploy anywhere that runs Node.
 
+### Docker-based local run
+
+```bash
+cp .env.example .env                # compose reads .env, not .env.local
+docker compose up --build           # http://localhost:4000 (dev, hot reload)
+docker compose --profile production up --build web-prod
+```
+
+`WEB_PORT` moves the host port for this checkout; the container always uses 4000.
+
 ## Enabling each layer
 
 **Authenticated routes** — create a read-only monitor staff account, log in,

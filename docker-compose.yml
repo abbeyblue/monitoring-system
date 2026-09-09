@@ -1,0 +1,50 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${WEB_PORT:-4000}:${WEB_PORT:-4000}"
+    env_file:
+      - .env
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Host and container use the same port so the URL `next dev` prints is
+      # the one you open. Explicit here so env_file/image ENV cannot override it.
+      WEB_PORT: "${WEB_PORT:-4000}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      # No named volume for /app/.next: it would survive rebuilds and Next
+      # upgrades while the source under it is replaced, serving HTML that
+      # references chunk hashes which no longer exist (200 document, 404 assets).
+    command: npm run dev
+
+  web-prod:
+    profiles:
+      - production
+    # No build args: this app has no NEXT_PUBLIC_* vars — every setting is read
+    # server-side in src/lib/config.ts, so env_file at runtime covers all of it.
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_PORT:-4000}:4000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      # WEB_PORT is a HOST-side setting. env_file would leak this checkout's
+      # value into the container and make the app bind the wrong port.
+      WEB_PORT: "4000"
+      # src/middleware.ts fails closed: without MONITOR_USERS or MONITOR_PASSWORD
+      # in .env, every page returns 503 under NODE_ENV=production.
+    volumes:
+      # The Dockerfile declares VOLUME ["/app/.data"] for the JSON state store
+      # (used whenever DATABASE_URL is unset). Named here so KPI history is not
+      # dropped into a fresh anonymous volume on every rebuild.
+      - monitor_data:/app/.data
+
+volumes:
+  monitor_data:
