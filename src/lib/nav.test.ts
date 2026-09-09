@@ -20,10 +20,23 @@ function routesOnDisk(dir = APP, base = ""): string[] {
   return out;
 }
 
-const CRM_ONLY = [
-  "/crm/business-health", "/crm/customers", "/crm/leads",
-  "/crm/opportunities", "/crm/background-jobs", "/crm/webhooks",
+// The 29 routes the app shipped with, as they must appear under /crm. This is
+// the contract the user cares about — it silently broke once when a refactor
+// promoted most of them to the root, so it is asserted explicitly rather than
+// derived from SECTIONS (which would have moved right along with the bug).
+const ORIGINAL_29 = [
+  "/crm",
+  "/crm/service-health", "/crm/apis", "/crm/logs", "/crm/traces", "/crm/metrics",
+  "/crm/infrastructure", "/crm/databases", "/crm/queues", "/crm/customers",
+  "/crm/leads", "/crm/opportunities", "/crm/background-jobs", "/crm/integrations",
+  "/crm/webhooks", "/crm/business-health", "/crm/alerts", "/crm/alert-rules",
+  "/crm/incidents", "/crm/deployments", "/crm/runbooks", "/crm/security-events",
+  "/crm/audit-logs", "/crm/diagnostics", "/crm/slo", "/crm/capacity", "/crm/cost",
+  "/crm/monitoring-health", "/crm/settings",
 ];
+
+/** Added by the redesign, deliberately outside /crm. */
+const OUTSIDE_CRM = ["/", "/users", "/websites"];
 
 describe("nav", () => {
   it("every nav href resolves to a real page", () => {
@@ -34,9 +47,17 @@ describe("nav", () => {
     expect(routesOnDisk().filter((r) => !ALL_HREFS.includes(r))).toEqual([]);
   });
 
-  it("only CRM-specific pages live under /crm/", () => {
-    const under = ALL_HREFS.filter((h) => h.startsWith("/crm/")).sort();
-    expect(under).toEqual([...CRM_ONLY].sort());
+  it("keeps all 29 original monitoring routes under /crm", () => {
+    expect(ORIGINAL_29).toHaveLength(29);
+    const missingFromNav = ORIGINAL_29.filter((r) => !ALL_HREFS.includes(r));
+    expect(missingFromNav, "original routes dropped out of the nav").toEqual([]);
+    const missingOnDisk = ORIGINAL_29.filter((r) => !existsSync(fileFor(r)));
+    expect(missingOnDisk, "original routes missing a page").toEqual([]);
+  });
+
+  it("only the new sections live outside /crm", () => {
+    const outside = ALL_HREFS.filter((h) => h !== "/crm" && !h.startsWith("/crm/")).sort();
+    expect(outside).toEqual([...OUTSIDE_CRM].sort());
   });
 
   it("the overview is the root and the CRM has its own overview", () => {
@@ -48,45 +69,50 @@ describe("nav", () => {
     expect(sectionFor("/").id).toBe("overview");
     expect(sectionFor("/crm").id).toBe("crm");
     expect(sectionFor("/crm/customers").id).toBe("crm");
-    expect(sectionFor("/apis").id).toBe("services");
-    expect(sectionFor("/apis/post-customers").id).toBe("services");  // detail route
-    expect(sectionFor("/audit-logs").id).toBe("users");
-    expect(sectionFor("/cost").id).toBe("settings");
-    expect(tabFor(sectionFor("/traces"), "/traces")?.label).toBe("Traces");
+    expect(sectionFor("/crm/apis").id).toBe("services");
+    expect(sectionFor("/crm/apis/post-customers").id).toBe("services");  // detail route
+    expect(sectionFor("/crm/audit-logs").id).toBe("users");  // tab lives under /crm
+    expect(sectionFor("/crm/cost").id).toBe("settings");
+    expect(sectionFor("/users").id).toBe("users");
+    expect(tabFor(sectionFor("/crm/traces"), "/crm/traces")?.label).toBe("Traces");
   });
 
   it("neither / nor /crm swallows its children", () => {
     // Both are landing pages whose children are registered separately; a prefix
     // match on either would drag every page into the wrong section.
-    expect(sectionFor("/logs").id).toBe("logs");
+    expect(sectionFor("/crm/logs").id).toBe("logs");
     expect(sectionFor("/crm/leads").id).toBe("crm");
-    expect(sectionFor("/incidents").id).toBe("incidents");
+    expect(sectionFor("/crm/incidents").id).toBe("incidents");
   });
 });
 
 describe("legacy URL redirects", () => {
-  it("moves interim /crm/* URLs back to the root", () => {
-    expect(canonicalPath("/crm/incidents")).toBe("/incidents");
-    expect(canonicalPath("/crm/logs")).toBe("/logs");
-    expect(canonicalPath("/crm/cost")).toBe("/cost");
-    expect(canonicalPath("/crm/incidents/INC-1042")).toBe("/incidents/INC-1042");
+  it("moves bare monitoring URLs under /crm", () => {
+    expect(canonicalPath("/incidents")).toBe("/crm/incidents");
+    expect(canonicalPath("/logs")).toBe("/crm/logs");
+    expect(canonicalPath("/settings")).toBe("/crm/settings");
+    expect(canonicalPath("/customers")).toBe("/crm/customers");
+    expect(canonicalPath("/incidents/INC-1042")).toBe("/crm/incidents/INC-1042");
   });
 
-  it("moves CRM-specific root URLs under /crm", () => {
-    expect(canonicalPath("/customers")).toBe("/crm/customers");
-    expect(canonicalPath("/leads")).toBe("/crm/leads");
-    expect(canonicalPath("/webhooks")).toBe("/crm/webhooks");
+  it("keeps the new root sections at the root", () => {
+    expect(canonicalPath("/users")).toBeNull();
+    expect(canonicalPath("/websites")).toBeNull();
+    // These lived under /crm during an earlier iteration, so the symmetric
+    // rule sends those URLs back up rather than 404ing them.
+    expect(canonicalPath("/crm/users")).toBe("/users");
+    expect(canonicalPath("/crm/websites")).toBe("/websites");
   });
 
   it("leaves canonical paths alone — this is what prevents a redirect loop", () => {
-    for (const p of ["/", "/crm", "/incidents", "/crm/customers", "/incidents/INC-1042", "/service-health/customer"]) {
+    for (const p of ["/", "/crm", "/users", "/websites", "/crm/incidents", "/crm/customers", "/crm/incidents/INC-1042", "/crm/service-health/customer"]) {
       expect(canonicalPath(p), `${p} must not redirect`).toBeNull();
     }
   });
 
   it("never redirects into a loop", () => {
     // Whatever a path maps to must itself be terminal.
-    for (const p of [...ALL_HREFS, "/crm/incidents", "/customers", "/crm/logs"]) {
+    for (const p of [...ALL_HREFS, "/incidents", "/customers", "/logs", "/crm/users"]) {
       const once = canonicalPath(p);
       if (once) expect(canonicalPath(once), `${p} -> ${once} -> ?`).toBeNull();
     }
@@ -131,9 +157,9 @@ describe("route authorization survives the move", () => {
   });
 
   it("sales cannot reach cost or the security pages", () => {
-    expect(routeAllowed("sales", "/cost")).toBe(false);
-    expect(routeAllowed("sales", "/security-events")).toBe(false);
-    expect(routeAllowed("finance", "/audit-logs")).toBe(false);
-    expect(routeAllowed("finance", "/cost")).toBe(true);
+    expect(routeAllowed("sales", "/crm/cost")).toBe(false);
+    expect(routeAllowed("sales", "/crm/security-events")).toBe(false);
+    expect(routeAllowed("finance", "/crm/audit-logs")).toBe(false);
+    expect(routeAllowed("finance", "/crm/cost")).toBe(true);
   });
 });

@@ -87,7 +87,7 @@ export default function SystemOverview() {
               Raised by the alert engine from live probe failures and threshold breaches.
             </p>
           </div>
-          <Link href="/incidents" className="rounded-ctl border border-down bg-down px-3.5 py-[7px] text-[12.5px] font-medium text-white transition-opacity hover:opacity-90">
+          <Link href="/crm/incidents" className="rounded-ctl border border-down bg-down px-3.5 py-[7px] text-[12.5px] font-medium text-white transition-opacity hover:opacity-90">
             View incidents
           </Link>
         </div>
@@ -113,7 +113,7 @@ export default function SystemOverview() {
           status={`${svcOk} / ${SERVICES.length} healthy`}
           k1="Mapped to probes" v1={String(Object.keys(LIVE_PROBE_MAP).length)}
           k2="Catalog" v2="illustrative"
-          foot="Live where a probe is mapped" href="/service-health"
+          foot="Live where a probe is mapped" href="/crm/service-health"
         />
         <StatusCard
           title="Websites" sub="no sites registered" health="unknown" status="Not configured"
@@ -138,12 +138,12 @@ export default function SystemOverview() {
 
         {/* Service Health — illustrative catalog, live where a probe is mapped */}
         <section>
-          <Head title="Service Health" href="/service-health" linkLabel="All services">
+          <Head title="Service Health" href="/crm/service-health" linkLabel="All services">
             <MockBadge label="Catalog" />
           </Head>
           <div className="overflow-hidden rounded-card border border-line bg-panel shadow-card">
             {SERVICES.map((s) => (
-              <Link key={s.id} href={`/service-health/${s.id}`}
+              <Link key={s.id} href={`/crm/service-health/${s.id}`}
                 className="flex cursor-pointer items-center gap-3 border-b border-line2 px-4 py-2.5 last:border-0 transition-colors hover:bg-hover">
                 <Dot health={s.health} />
                 <span className="min-w-0 flex-1 truncate text-[13.5px]">{s.name}</span>
@@ -173,7 +173,7 @@ export default function SystemOverview() {
 
       {/* Recent Events — real active incidents first, then the illustrative catalog */}
       <section>
-        <Head title="Recent Events" href="/incidents" linkLabel="All incidents">
+        <Head title="Recent Events" href="/crm/incidents" linkLabel="All incidents">
           <MockBadge label="Catalog below live rows" />
         </Head>
         <div className="overflow-hidden rounded-card border border-line bg-panel shadow-card">
@@ -186,7 +186,7 @@ export default function SystemOverview() {
             </div>
           ))}
           {INCIDENTS.map((i) => (
-            <Link key={i.id} href={`/incidents/${i.id}`}
+            <Link key={i.id} href={`/crm/incidents/${i.id}`}
               className="flex cursor-pointer items-baseline gap-4 border-b border-line2 px-4 py-3 last:border-0 transition-colors hover:bg-hover">
               <span className="w-[74px] shrink-0 font-mono text-[11.5px] text-muted">{i.id}</span>
               <span className="relative -top-px h-1.5 w-1.5 shrink-0 rounded-full bg-idle" />
