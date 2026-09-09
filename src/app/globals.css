@@ -1,54 +1,76 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Light theme (default, bare :root) — RGB triplets for rgb(var / alpha) */
+/* Typography is the Apple system stack (see tailwind.config.ts) — no webfont
+   request. The previous Google Fonts @import was render-blocking. */
+
+/* Light theme (default, bare :root) — RGB triplets for rgb(var / alpha).
+   Values come from the Claude Design source (tone() + inline styles). */
 :root {
-  --bg: 244 246 249;
-  --panel: 255 255 255;
-  --panel2: 240 243 246;
-  --line: 224 228 234;
-  --ink: 15 23 42;
-  --muted: 91 102 117;
-  --ok: 22 163 74;
-  --warn: 217 119 6;
-  --down: 220 38 38;
-  --idle: 148 163 184;
-  --accent: 37 99 235;
+  --bg: 248 250 252;        /* #f8fafc */
+  --panel: 255 255 255;     /* #fff   */
+  --panel2: 236 236 240;    /* #ececf0 chips, inset controls */
+  --line: 226 226 230;      /* #e2e2e6 card borders */
+  --line2: 238 238 242;     /* #eeeef2 inner dividers */
+  --hover: 251 251 253;     /* #fbfbfd row hover */
+  --ink: 23 23 23;          /* #171717 */
+  --ink2: 43 50 68;         /* #2b3244 secondary text, control labels */
+  --muted: 91 100 120;      /* #5b6478 */
+  --muted2: 111 119 137;    /* #6f7789 field labels */
+  --accent: 25 67 190;      /* #1943BE */
+  --heading: 154 111 47;    /* #9a6f2f bronze section headings */
+
+  --ok: 48 161 78;          --ok-fg: 30 122 60;   --ok-bg: 234 247 238;   --ok-bd: 201 231 210;
+  --warn: 200 138 0;        --warn-fg: 138 95 0;  --warn-bg: 253 245 230; --warn-bd: 238 220 180;
+  --down: 209 53 43;        --down-fg: 176 39 29; --down-bg: 253 238 236; --down-bd: 242 201 196;
+  --idle: 111 119 137;      --idle-fg: 91 100 120;--idle-bg: 243 245 246; --idle-bd: 226 226 230;
 }
 
-/* Dark — system default (no explicit choice) */
+/* Dark. The design is light-only, so these are a working translation of the
+   same tokens rather than a designed dark theme — the toggle keeps working and
+   dark gets a proper pass later. Declared twice because a media query and an
+   attribute selector cannot be merged: system default, then explicit toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: 9 13 20;
     --panel: 16 21 30;
-    --panel2: 22 28 39;
+    --panel2: 28 35 48;
     --line: 35 44 58;
+    --line2: 30 38 50;
+    --hover: 22 28 39;
     --ink: 232 237 244;
+    --ink2: 209 217 228;
     --muted: 138 151 168;
-    --ok: 34 197 94;
-    --warn: 245 158 11;
-    --down: 239 68 68;
-    --idle: 100 116 139;
-    --accent: 59 130 246;
+    --muted2: 120 133 150;
+    --accent: 90 141 245;
+    --heading: 199 158 92;
+
+    --ok: 52 199 89;    --ok-fg: 134 226 160;  --ok-bg: 20 44 29;    --ok-bd: 30 66 43;
+    --warn: 245 176 39; --warn-fg: 250 214 137;--warn-bg: 51 39 12;  --warn-bd: 79 60 18;
+    --down: 255 105 97; --down-fg: 255 160 154;--down-bg: 56 22 20;  --down-bd: 84 33 30;
+    --idle: 120 133 150;--idle-fg: 138 151 168;--idle-bg: 24 30 40;  --idle-bd: 40 49 63;
   }
 }
 
-/* Dark — explicit toggle wins in both directions */
 :root[data-theme="dark"] {
   --bg: 9 13 20;
   --panel: 16 21 30;
-  --panel2: 22 28 39;
+  --panel2: 28 35 48;
   --line: 35 44 58;
+  --line2: 30 38 50;
+  --hover: 22 28 39;
   --ink: 232 237 244;
+  --ink2: 209 217 228;
   --muted: 138 151 168;
-  --ok: 34 197 94;
-  --warn: 245 158 11;
-  --down: 239 68 68;
-  --idle: 100 116 139;
-  --accent: 59 130 246;
+  --muted2: 120 133 150;
+  --accent: 90 141 245;
+  --heading: 199 158 92;
+
+  --ok: 52 199 89;    --ok-fg: 134 226 160;  --ok-bg: 20 44 29;    --ok-bd: 30 66 43;
+  --warn: 245 176 39; --warn-fg: 250 214 137;--warn-bg: 51 39 12;  --warn-bd: 79 60 18;
+  --down: 255 105 97; --down-fg: 255 160 154;--down-bg: 56 22 20;  --down-bd: 84 33 30;
+  --idle: 120 133 150;--idle-fg: 138 151 168;--idle-bg: 24 30 40;  --idle-bd: 40 49 63;
 }
 
 html, body {
@@ -56,12 +78,18 @@ html, body {
   color: rgb(var(--ink));
 }
 
+::selection { background: rgb(var(--accent) / 0.18); }
+
 * {
   scrollbar-width: thin;
   scrollbar-color: rgb(var(--line)) transparent;
 }
-*::-webkit-scrollbar { height: 8px; width: 8px; }
-*::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 999px; }
+*::-webkit-scrollbar { height: 10px; width: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--line));
+  border-radius: 12px;
+  border: 3px solid rgb(var(--bg));
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }

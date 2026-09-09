@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { MonitorProvider } from "@/components/monitor-context";
-import { AppShell } from "@/components/app-shell";
 
 export const metadata: Metadata = {
-  title: "CRM Monitor",
+  title: "Abbey Blue Monitoring",
   description: "Standalone status dashboard for the Abbey Blue CRM.",
 };
 
@@ -17,11 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="font-sans antialiased">
-        <MonitorProvider>
-          <AppShell>{children}</AppShell>
-        </MonitorProvider>
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }
