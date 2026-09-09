@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRole, routeAllowed, verifyUser, parseUsers, type MonitorRole } from "@/lib/roles";
+import { canonicalPath } from "@/lib/nav";
 
 const ROLE_HEADER = "x-crm-monitor-role";
 
@@ -43,15 +44,19 @@ export function proxy(req: NextRequest) {
     role = getRole();
   }
 
-  // Monitoring pages moved under /crm — 308 the old root-level URLs.
+  // Legacy URLs -> canonical. nav.ts owns the route map, so this handles both
+  // directions (/crm/incidents -> /incidents, /customers -> /crm/customers) and
+  // returns null for anything already canonical, which is what stops a loop.
   // _next (HMR, data), api and public assets must pass through untouched.
-  const passthrough = path === "/crm" || path.startsWith("/crm/")
-    || path === "/api" || path.startsWith("/api/")
+  const passthrough = path === "/api" || path.startsWith("/api/")
     || path.startsWith("/_next/") || path === "/robots.txt" || path === "/favicon.ico";
   if (!passthrough) {
-    const url = req.nextUrl.clone();
-    url.pathname = path === "/" ? "/crm" : `/crm${path}`;
-    return NextResponse.redirect(url, 308);
+    const target = canonicalPath(path);
+    if (target) {
+      const url = req.nextUrl.clone();
+      url.pathname = target;
+      return NextResponse.redirect(url, 308);
+    }
   }
 
   // role route guard (server-side, fail closed)

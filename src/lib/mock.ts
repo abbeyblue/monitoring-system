@@ -378,13 +378,13 @@ export const rel = (hhmm: string) => hhmm; // times are already display strings
 export interface SearchHit { id: string; label: string; type: string; href: string; }
 export function searchIndex(): SearchHit[] {
   const hits: SearchHit[] = [];
-  for (const s of SERVICES) hits.push({ id: s.id, label: s.name, type: "Service", href: `/crm/service-health/${s.id}` });
-  for (const a of APIS) hits.push({ id: a.id, label: `${a.method} ${a.endpoint}`, type: "API", href: `/crm/apis/${a.id}` });
-  for (const t of TRACES) hits.push({ id: t.id, label: `${t.id} · ${t.endpoint}`, type: "Trace", href: `/crm/traces/${t.id}` });
-  for (const i of INCIDENTS) hits.push({ id: i.id, label: `${i.id} · ${i.title}`, type: "Incident", href: `/crm/incidents/${i.id}` });
-  for (const a of ALERTS) hits.push({ id: a.id, label: `${a.id} · ${a.title}`, type: "Alert", href: `/crm/alerts` });
-  for (const d of DEPLOYMENTS) hits.push({ id: d.id, label: `${d.version} · ${d.commit}`, type: "Deployment", href: `/crm/deployments/${d.id}` });
-  for (const d of DATABASES) hits.push({ id: d.id, label: d.name, type: "Database", href: `/crm/databases/${d.id}` });
-  for (const l of LOGS) hits.push({ id: l.requestId, label: `${l.requestId} · ${l.endpoint}`, type: "Request", href: `/crm/logs?q=${l.requestId}` });
+  for (const s of SERVICES) hits.push({ id: s.id, label: s.name, type: "Service", href: `/service-health/${s.id}` });
+  for (const a of APIS) hits.push({ id: a.id, label: `${a.method} ${a.endpoint}`, type: "API", href: `/apis/${a.id}` });
+  for (const t of TRACES) hits.push({ id: t.id, label: `${t.id} · ${t.endpoint}`, type: "Trace", href: `/traces/${t.id}` });
+  for (const i of INCIDENTS) hits.push({ id: i.id, label: `${i.id} · ${i.title}`, type: "Incident", href: `/incidents/${i.id}` });
+  for (const a of ALERTS) hits.push({ id: a.id, label: `${a.id} · ${a.title}`, type: "Alert", href: `/alerts` });
+  for (const d of DEPLOYMENTS) hits.push({ id: d.id, label: `${d.version} · ${d.commit}`, type: "Deployment", href: `/deployments/${d.id}` });
+  for (const d of DATABASES) hits.push({ id: d.id, label: d.name, type: "Database", href: `/databases/${d.id}` });
+  for (const l of LOGS) hits.push({ id: l.requestId, label: `${l.requestId} · ${l.endpoint}`, type: "Request", href: `/logs?q=${l.requestId}` });
   return hits;
 }

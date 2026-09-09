@@ -104,7 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* ---- sidebar (desktop) ---- */}
         <aside className="sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-line bg-bg/[0.86] backdrop-blur-chrome backdrop-saturate-[1.8] md:flex">
           <div className="border-b border-line2 px-[18px] py-5">
-            <Link href="/crm" className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5">
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px] bg-[#151c34] text-xs font-semibold tracking-[0.02em] text-white">AB</span>
               <span className="flex flex-col leading-[1.25]">
                 <strong className="text-[13.5px] font-semibold">Abbey Blue</strong>

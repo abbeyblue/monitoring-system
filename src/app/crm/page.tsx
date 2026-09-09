@@ -49,31 +49,13 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-6">
-      {/* active-incident banner — real, from the alert engine */}
-      {activeIncidents > 0 && (
-        <div className="flex flex-wrap items-start gap-3.5 rounded-card border border-down-bd border-l-[3px] border-l-down bg-panel px-[18px] py-4">
-          <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-down motion-safe:animate-abpulse" />
-          <div className="min-w-0 flex-1">
-            <strong className="text-[15px] font-semibold">
-              {activeIncidents} active incident{activeIncidents !== 1 ? "s" : ""}
-            </strong>
-            <p className="mt-1.5 max-w-[70ch] text-[13.5px] text-muted">
-              Raised by the alert engine from live probe failures and threshold breaches.
-            </p>
-          </div>
-          <Link href="/crm/incidents" className="rounded-ctl border border-down bg-down px-3.5 py-[7px] text-[12.5px] font-medium text-white transition-opacity hover:opacity-90">
-            View incidents
-          </Link>
-        </div>
-      )}
-
       {/* hero — real signals, never fabricated */}
       <div className={`flex flex-wrap items-center justify-between gap-4 rounded-card border bg-panel p-5 shadow-card ${heroTone.bd}`}>
         <div className="flex items-center gap-4">
           <Dot health={notConnected ? "unknown" : overall} pulse={overall === "healthy" && !notConnected} />
           <div>
             <div className={`text-2xl font-semibold tracking-[-0.022em] ${heroTone.fg}`}>
-              {notConnected ? "Not connected" : overall === "unknown" ? "Checking…" : overall === "healthy" ? "All Systems Operational" : HEALTH_LABEL[overall]}
+              {notConnected ? "Not connected" : overall === "unknown" ? "Checking…" : overall === "healthy" ? "CRM Operational" : HEALTH_LABEL[overall]}
             </div>
             <p className="mt-1 text-[12.5px] text-muted">
               {notConnected
@@ -84,7 +66,7 @@ export default function Dashboard() {
         </div>
         <div className="flex flex-wrap gap-2">
           {SERVICES.map((s) => (
-            <Link key={s.id} href={`/crm/service-health/${s.id}`} className="flex cursor-pointer items-center gap-2 rounded-ctl border border-line bg-panel px-2.5 py-1.5 text-[12px] transition-colors hover:border-muted2/60 hover:bg-hover">
+            <Link key={s.id} href={`/service-health/${s.id}`} className="flex cursor-pointer items-center gap-2 rounded-ctl border border-line bg-panel px-2.5 py-1.5 text-[12px] transition-colors hover:border-muted2/60 hover:bg-hover">
               <Dot health={s.health} /><span className="hidden lg:inline">{s.name.replace(" Service", "")}</span>
             </Link>
           ))}
@@ -112,9 +94,9 @@ export default function Dashboard() {
           <span className="flex items-center gap-1.5 text-[11.5px] text-muted"><span className="h-1.5 w-1.5 rounded-full bg-ok motion-safe:animate-pulse" />live · probes</span>
         </Head>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          <Stat label="API availability" value={probes.length ? `${probesUp}/${probes.length}` : "—"} sub="endpoints up" health={sysCrit ? "critical" : probes.length ? "healthy" : "unknown"} href="/crm/apis" />
-          <Stat label="Active incidents" value={String(activeIncidents)} sub="from alert engine" health={activeIncidents ? "critical" : "healthy"} href="/crm/incidents" />
-          <Stat label="Service health" value={`${SERVICES.filter((s) => s.health === "healthy").length}/${SERVICES.length}`} sub="live where mapped" health="degraded" href="/crm/service-health" />
+          <Stat label="API availability" value={probes.length ? `${probesUp}/${probes.length}` : "—"} sub="endpoints up" health={sysCrit ? "critical" : probes.length ? "healthy" : "unknown"} href="/apis" />
+          <Stat label="Active incidents" value={String(activeIncidents)} sub="from alert engine" health={activeIncidents ? "critical" : "healthy"} href="/incidents" />
+          <Stat label="Service health" value={`${SERVICES.filter((s) => s.health === "healthy").length}/${SERVICES.length}`} sub="live where mapped" health="degraded" href="/service-health" />
         </div>
       </section>
 
@@ -133,7 +115,7 @@ export default function Dashboard() {
         <Panel title="Incidents" status="critical" right={<MockBadge />}>
           <div className="divide-y divide-line2">
             {INCIDENTS.map((i) => (
-              <Link key={i.id} href={`/crm/incidents/${i.id}`} className="flex cursor-pointer items-center gap-3 px-4 py-3 text-[13px] transition-colors hover:bg-hover">
+              <Link key={i.id} href={`/incidents/${i.id}`} className="flex cursor-pointer items-center gap-3 px-4 py-3 text-[13px] transition-colors hover:bg-hover">
                 <Sev level={i.severity} />
                 <span className="min-w-0 flex-1"><span className="block truncate font-medium">{i.title}</span><span className="font-mono text-[11px] text-muted">{i.id} · {i.services.join(", ")}</span></span>
                 <span className="shrink-0 text-[11.5px] text-muted">{i.status}</span>
@@ -144,7 +126,7 @@ export default function Dashboard() {
         <Panel title="Deployments" right={<MockBadge />}>
           <div className="divide-y divide-line2">
             {DEPLOYMENTS.map((d) => (
-              <Link key={d.id} href={`/crm/deployments/${d.id}`} className="flex cursor-pointer items-center gap-3 px-4 py-3 text-[13px] transition-colors hover:bg-hover">
+              <Link key={d.id} href={`/deployments/${d.id}`} className="flex cursor-pointer items-center gap-3 px-4 py-3 text-[13px] transition-colors hover:bg-hover">
                 <Dot health={d.status} />
                 <span className="min-w-0 flex-1"><span className="block truncate font-medium">{d.version} <span className="font-mono text-[11px] text-muted">{d.commit}</span></span><span className="text-[11.5px] text-muted">{d.services.join(", ")}</span></span>
                 <span className="shrink-0 font-mono text-[11px] text-muted">{d.start}</span>
